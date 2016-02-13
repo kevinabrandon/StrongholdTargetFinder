@@ -121,5 +121,5 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 	key = cv2.waitKey(1) & 0xFF
 
 	# if the `q` key was pressed, break from the loop
-	if key == ord("q") or key = 27:
+	if key == ord("q") or key == 27:
 		break
