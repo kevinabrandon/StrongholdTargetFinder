@@ -43,17 +43,16 @@ def CheckAngles(corners, epsilon):
 		i0 = i 				# index to the first corner
 		i1 = (i + 1) % 4	# index to the next corner
 
-		vector = corners[i1][0] - corners[i0][0]
-
-		theta = 0	# we will save the angle of the side here.
-
+		x = abs(corners[i1][0][0] - corners[i0][0][0])	# the difference in x
+		y = abs(corners[i1][0][1] - corners[i0][0][1])	# the difference in y
+		
 		# if x > y, then it's mostly horizontal
-		if abs(vector[0]) > abs(vector[1]):	
-			# the angle off horizontal is atan(y/x)
-			theta = math.atan(vector[1]/vector[0]) * 180 / math.pi
+		if x > y:	
+			# the angle off horizontal
+			theta = math.atan2(y,x) * 180 / math.pi
 		else:
-			# the angle off vertical is atan(x/y)
-			theta = math.atan(vector[0]/vector[1]) * 180 / math.pi
+			# the angle off vertical 
+			theta = math.atan2(x,y) * 180 / math.pi
 
 		# if the angle is greater than epsilon, then it's not vertical or horizontal, so return false
 		if abs(theta) > epsilon:
