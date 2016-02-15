@@ -15,7 +15,7 @@
 #
 #		* Also there is an auto-exposure algorithim running to keep the image with a constant average pixel value.
 #
-#   2/10/2016 - KAB - kevinabrandon@gmail.com
+#   2/15/2016 - KAB - kevinabrandon@gmail.com
 #
 
 # import the necessary packages
