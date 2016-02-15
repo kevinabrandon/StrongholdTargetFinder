@@ -9,7 +9,7 @@ Here I followed [this tutorial](http://www.pyimagesearch.com/2015/10/26/how-to-i
 
 ## Install git and clone this repository
 Install git by typing: `sudo apt-get install git`
-Then clone this project by typing:  `git clone https:://github.com/kevinabrandon/StrongholdTargetFinder.git`
+Then clone this project by typing:  `git clone https://github.com/kevinabrandon/StrongholdTargetFinder.git`
 
 ## Run the tutorias
 To run a program simply type `python` followed by the filename of the program:
