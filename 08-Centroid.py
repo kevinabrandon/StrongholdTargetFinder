@@ -2,7 +2,7 @@
 #  08-Centroid.py
 #
 #  Eighth lesson in a tutorial for detecting a target in opencv using python on a raspberry pi.
-#  This lesson we check get the centroid of the target and measure it's angle in the field of view of the camera.
+#  This lesson we get the centroid of the target and measure it's angle in the field of view of the camera.
 #
 #    The algorithim follows these steps:
 #		1. Uses a threshold or an optional adaptive threshold to create a binary image
