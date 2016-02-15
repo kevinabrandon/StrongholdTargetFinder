@@ -10,7 +10,7 @@
 #		3. Gets the convex hull of each contour
 #		4. Checks to see that the hull has a sufficently large hull
 #		5. Approximates the hull in order to get only 4 points (mostly a rectangle)
-#		6. Checks the angles of each corner of the hull to verify they are close to 90 degrees
+#		6. Checks each side to make sure they are mostly horizontal or vertical
 #
 #		* Also there is an auto-exposure algorithim running to keep the image with a constant average pixel value.
 #
@@ -31,50 +31,35 @@ print 'press "q" or "esc" to quit!'
 def nothing(jnk):
 	pass
 
-# returns the magnitude of a 2d vector
-def Mag2D(v):
-	return math.sqrt(v[0]**2 + v[1]**2)
-
-# Normalizes the input 2d vector
-def Norm2D(v):
-	vmag = Mag2D(v)
-	return [ v[0] / vmag,  v[1] / vmag]
-
-# returns the dot product of a 2d vector
-def DotProd2D(v1, v2):
-	return v1[0] * v2[0] + v1[1] * v2[1]
-
-
-# a function that checks the 4 corners of a quadrilatal.  
-# If all 4 corners are close to 90 degrees (+/- epsilon) return true
-def HaveRightAngles(corners, epsilon):
-	# require verts to have a length of 4
+# a function that checks the 4 sides of a quadrilatal.  
+# If all 4 sides are close to horizontal or vertical (+/- epsilon) return true
+def CheckAngles(corners, epsilon):
+	# require 4 corners
 	if len(corners) != 4:
 		return False
 
-	# loop through each vertex
+	# loop through each corner
 	for i in range(4):
-		# the angle between two vectors is the arccosine of the dot product between their normalized vectors:
-		# http://www.euclideanspace.com/maths/algebra/vectors/angleBetween/
-		i0 = i 				# index to the first vertex
-		i1 = (i + 1) % 4	# index to the second vertex... we're going to find the angle here!
-		i2 = (i + 2) % 4	# index to the third vertex
+		i0 = i 				# index to the first corner
+		i1 = (i + 1) % 4	# index to the next corner
 
-		v1 = corners[i1][0] - corners[i0][0]	# the first vector
-		v2 = corners[i2][0] - corners[i1][0]	# the second vector
+		vector = corners[i1][0] - corners[i0][0]
 
-		dot = DotProd2D(Norm2D(v1), Norm2D(v2))	# the dot product of the normalized vectors
+		theta = 0	# we will save the angle of the side here.
 
-		dot = min(dot, 1)	# limit it to one... due to floating point rounding errors, we can get > 1 which is impossible in real life
+		# if x > y, then it's mostly horizontal
+		if abs(vector[0]) > abs(vector[1]):	
+			# the angle off horizontal is atan(y/x)
+			theta = math.atan(vector[1]/vector[0]) * 180 / math.pi
+		else:
+			# the angle off vertical is atan(x/y)
+			theta = math.atan(vector[0]/vector[1]) * 180 / math.pi
 
-		theta = math.acos(dot) * 180 / math.pi 	# angle in degrees between the vectors
-
-		#print i, theta, " ", epsilon
-		# if the difference between theta and 90 degrees is greater than epsilon then return false
-		if abs(theta - 90) > epsilon:
+		# if the angle is greater than epsilon, then it's not vertical or horizontal, so return false
+		if abs(theta) > epsilon:
 			return False 
 
-	# if' we get here then all corners have been checked and are okay.
+	# if we get here then all corners have been checked and are okay.
 	return True
 
 #some color values we'll be using
@@ -93,7 +78,7 @@ cv2.createTrackbar('showThreshold', winName, 0, 1, nothing)  # shows the thresho
 cv2.createTrackbar('threshold', winName, 35, 255, nothing)  # the threshold value
 cv2.createTrackbar('minPerim', winName, 100, 1000, nothing)  # the minimum perimiter of the convex hull to be kept
 cv2.createTrackbar('autoShutter', winName, 22, 255, nothing) # used to automatically set the shutter speed, this is the target average pixel value.
-cv2.createTrackbar('off90Degrees', winName, 20, 45, nothing) # used to require angles of detected target to be near 90 degrees (this is how near)
+cv2.createTrackbar('angleOffHoriz', winName, 20, 45, nothing) # used to require sides to be aligned vertical or horizontal
 
 # initialize the camera and grab a reference to the raw camera capture
 # there are a lot of options we can do here... check out the examples
@@ -116,7 +101,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 	thresh = cv2.getTrackbarPos('threshold',winName)
 	minPerim = cv2.getTrackbarPos('minPerim', winName)
 	autoShutter = cv2.getTrackbarPos('autoShutter', winName)
-	off90 = cv2.getTrackbarPos('off90Degrees', winName)
+	eps = cv2.getTrackbarPos('angleOffHoriz', winName)
 	ss = camera.shutter_speed	# also get the shutter speed.
 
 	#start timer
@@ -160,8 +145,8 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
 			# only add this target if it has 4 verticies
 			if len(aproxHull) == 4:
-				# check to see if the 4 verticies are near right angles
-				if HaveRightAngles(aproxHull, off90):
+				# check to see if the 4 sides are near horizontal or vertical
+				if CheckAngles(aproxHull, eps):
 					# add the contour to the list of final targets
 					finalTargets.append(aproxHull)
 
