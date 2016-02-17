@@ -163,10 +163,13 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
 	# threshold the grayscale image
 	if useAdaptive == 0:
+		#use the simple global threshold routine
 		ret, threshImg = cv2.threshold(gray_image, thresh, 255, cv2.THRESH_BINARY)
 	else:
+		# use the fancy adaptive threshold routine
 		threshImg = cv2.adaptiveThreshold(gray_image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV, adaptiveSize, thresh)
-	# if the trackbar is set to 1, use the threshold image to draw on instead
+
+	# if the trackbar is set to 1, use the threshold image to draw on instead of the original
 	if drawThresh == 1:
 		# convert the threshold image back to color so we can draw on it with colorful lines
 		drawnImage = cv2.cvtColor(threshImg, cv2.COLOR_GRAY2RGB)
